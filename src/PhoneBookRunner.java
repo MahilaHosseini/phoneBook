@@ -1,15 +1,11 @@
-import java.util.InputMismatchException;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.TreeMap;
+import java.util.*;
 
 public class PhoneBookRunner {
-
+    private static List<Contact> phoneBook;
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         int userInput = 4;
-        Map<String, String> phoneBook = new TreeMap<>();
-
+        phoneBook = new ArrayList<>();
         System.out.println("Welcome to your phone book");
         System.out.println("**************************");
         OuterLoop:while(true){
@@ -42,47 +38,60 @@ public class PhoneBookRunner {
 
     }
 
-    private static void printPhoneBook(Map<String, String> phoneBook) {
-        for (Map.Entry<String, String> entry : phoneBook.entrySet()) {
-            System.out.println("name: " + entry.getKey() + ", number: " + entry.getValue());
+    private static void printPhoneBook(List<Contact> phoneBook) {
+        for (Contact contact : phoneBook ) {
+            System.out.println("name: " + contact.getName() + ", numbers: ");
+            for (String number : contact.getNumbers())
+                System.out.println(number);
         }
         System.out.println("**************************");
     }
 
-    private static void addContact(Scanner scanner, Map<String, String> phoneBook) {
+    private static void addContact(Scanner scanner, List<Contact> phoneBook) {
         String name;
         String number;
         int userInput;
+        boolean redundant = false;
         System.out.println("Please enter the name: ");
         name = scanner.nextLine();
-        if (phoneBook.containsKey(name)) {
-            System.out.println("That name already exists in your phone book !" +
-                    "\n press 1 if you want to keep editing their number." +
-                    "\n press any key to return to main menu.");
-            try{
-                userInput = scanner.nextInt();}
-            catch (InputMismatchException e){
-                System.out.println("Please!!! only enter specified numbers!");
-                scanner.nextLine();
-                return;
-            }
-            scanner.nextLine();
-            if (userInput == 1){
-                System.out.println("Please enter the phone number: ");
-                number = scanner.nextLine();
-                if (number.matches("^09\\d{9}$"))
-                    phoneBook.put(name, number);
-                else{
-                    System.out.println("That number is not valid please enter a valid one next time!");
+        for (Contact contact : phoneBook){
+            if (contact.getName().equals(name)){
+                System.out.println("That name already exists in your phone book !" +
+                        "\n press 1 if you want to add another number for them." +
+                        "\n press any key to return to main menu.");
+                try{
+                    userInput = scanner.nextInt();
+                    scanner.nextLine();
                 }
+                catch (InputMismatchException e){
+                    System.out.println("Please!!! only enter specified numbers!");
+                    scanner.nextLine();
+                    return;
+                }
+                if (userInput == 1){
+                    System.out.println("Please enter the phone number: ");
+                    number = scanner.nextLine();
+                    if (number.matches("^09\\d{9}$"))
+                        contact.getNumbers().add(number);
+                    else{
+                        System.out.println("That number is not valid please enter a valid one next time!");
+                    }
+                }
+
+                redundant = true;
+                break;
             }
-            else
-                scanner.nextLine();
-        } else {
+        }
+
+        if (!redundant) {
             System.out.println("Please enter the phone number: ");
             number = scanner.nextLine();
-            if (number.matches("^09\\d{9}$"))
-                phoneBook.put(name, number);
+            if (number.matches("^09\\d{9}$")){
+                Contact contact = new Contact();
+                contact.setName(name);
+                contact.addNumber(number);
+                phoneBook.add(contact);
+            }
             else{
                 System.out.println("That number is not valid please enter a valid one next time!");
             }
